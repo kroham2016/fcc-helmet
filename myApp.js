@@ -1,3 +1,4 @@
+
 /**********************************************
 * 4. Applied InfoSec Challenges
 * =============================
@@ -5,7 +6,6 @@
 
 var express = require('express'); // Do Not Edit
 var app = express();              // Do Not Edit
-
 // ----
 
 /** - Challenges - *
@@ -17,6 +17,7 @@ var app = express();              // Do Not Edit
 // Express apps by setting various HTTP headers.
 // Install the package, then require it.
 
+var helmet = require('helmet');
 
 
 /** 2) Hide potentially dangerous information - `helmet.hidePoweredBy()` */
@@ -31,6 +32,7 @@ var app = express();              // Do Not Edit
 
 // Use `helmet.hidePoweredBy()``
 
+app.use(helmet.hidePoweredBy());
 
 
 /** 3) Mitigate the risk of clickjacking - `helmet.frameguard()` */
@@ -46,7 +48,7 @@ var app = express();              // Do Not Edit
 // We don't need our app to be framed, so you should use `helmet.frameguard()`
 // passing to it the configuration object `{action: 'deny'}`
 
- 
+ app.use(helmet.frameguard({action:'deny'}));
 
 /** 4) Mitigate the risk of XSS - `helmet.xssFilter()` */
 
@@ -69,6 +71,7 @@ var app = express();              // Do Not Edit
 
 // Use `helmet.xssFilter()`
 
+app.use(helmet.xssFilter());
 
 
 /** 5) Avoid inferring the response MIME type - `helmet.noSniff()` */
@@ -82,6 +85,7 @@ var app = express();              // Do Not Edit
 
 // Use `helmet.noSniff()`
 
+app.use(helmet.noSniff())
 
 
 /** 6) Prevent IE from opening *untrusted* HTML - `helmet.ieNoOpen()` */
@@ -95,6 +99,7 @@ var app = express();              // Do Not Edit
 
 // Use `helmet.ieNoOpen()`
 
+app.use(helmet.ieNoOpen())
 
 
 /**  7) Ask browsers to access your site via HTTPS only - `helmet.hsts()` */
@@ -115,6 +120,7 @@ var app = express();              // Do Not Edit
 
 var ninetyDaysInSeconds = 90*24*60*60;
 
+app.use(helmet.hsts({maxAge: ninetyDaysInSeconds, force:true}));
 
 //**Note**:
 // Configuring HTTPS on a custom website requires the acquisition of a domain,
@@ -133,6 +139,7 @@ var ninetyDaysInSeconds = 90*24*60*60;
 
 // Use `helmet.dnsPrefetchControl()`
 
+app.use(helmet.dnsPrefetchControl());
 
 
 /** 9) Disable Client-Side Caching - `helmet.noCache()` */
@@ -145,6 +152,7 @@ var ninetyDaysInSeconds = 90*24*60*60;
 
 // Use helmet.noCache()
 
+app.use(helmet.noCache());
 
 
 /** 10) Content Security Policy - `helmet.contentSecurityPolicy()` */
@@ -175,7 +183,11 @@ var ninetyDaysInSeconds = 90*24*60*60;
 // in the `"'self'"` keyword, the single quotes are part of the keyword itself, 
 // so it needs to be enclosed in **double quotes** to be working.
 
-
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'",'trusted-cdn.com']
+}})); 
 
 /** TIP: */ 
 
@@ -203,7 +215,6 @@ var ninetyDaysInSeconds = 90*24*60*60;
 // cleaner, for a real project.
 
 // ---- DO NOT EDIT BELOW THIS LINE ---------------------------------------
-
 module.exports = app;
 var api = require('./server.js');
 app.use(express.static('public'));
